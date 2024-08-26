@@ -4,30 +4,38 @@ import readchar
 import threading
 import signal
 
-wheel_size = 26
+wheel_size = 26  # move to config file
+odometer = 69
 
-
-def miles(r): return (wheel_size * math.pi) * r / 12 / 5280  # miles
+def distance(r): return (wheel_size * math.pi) * r
+def miles(inch): return distance(inch) / 12 / 5280  # miles
 def hour(t): return (time.time() - t) / 60 / 60  # hours
-def mph(r, t): return miles(r) / hour(t)
+
+
+def speed(r, t):
+    return miles(r) / hour(t)
+
 
 def speed_listener(state, stop_event):
     def speedometer():
         while not stop_event.is_set():
-            r, p, s = state
+            r, p, s, o = state
             state[0] = 0
             state[1] = time.time() if r > 0 else p
             state[2] = current_speed(r, p, s)
-            print('current speed:', state[2])
+            state[3] += miles(r)
+
+            print(f'mph:', state[2], 'odo:', state[3])
             time.sleep(0.01)
     return speedometer
 
 
 def current_speed(r, p, s):
-    real = mph(r, p) if r > 0 else s
-    potential = mph(1, p)
-    speed = min(real, potential)
-    return math.floor(speed) if potential > 1.8 else 0  # jump to 0 early for aesthetics
+    real = speed(r, p) if r > 0 else s
+    potential = speed(1, p)
+    s = min(real, potential)
+    # jump to 0 early for aesthetics
+    return math.floor(s) if potential > 1.8 else 0
 
 
 def input_listener(state, stop_event):
@@ -45,9 +53,11 @@ def input_listener(state, stop_event):
 
 
 def main():
-    p = time.time()
-    r = 0
-    state = [r, p, 0]
+    revs = 0
+    prev_rev_time = time.time()
+    current_speed = 0
+    state = [revs, prev_rev_time, current_speed, odometer]
+
     stop_event = threading.Event()
     rev_listener = input_listener(state, stop_event)
     speedo_calc = speed_listener(state, stop_event)
