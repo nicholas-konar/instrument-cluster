@@ -1,4 +1,4 @@
-wheel_diameter: 26
 speedo_interval: 0.1
-odo_miles: 69
 odo_interval: 10
+odo_miles: 0
+wheel_diameter: 0
