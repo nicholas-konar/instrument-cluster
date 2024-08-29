@@ -1,10 +1,14 @@
 import signal
 import tkinter as tk
-from tkinter import ttk
 import tkintermapview
 import random
 
+from tkinter import ttk
+from odometer import Odometer
 from speedometer import Speedometer
+from state import State
+
+
 
 def create_mock_gps():
     state = {"latitude": 40.7128, "longitude": -74.0060}
@@ -55,7 +59,9 @@ def control_panel(master, speedometer):
 
 def main():
     root = tk.Tk()
-    speedometer = Speedometer()
+    state = State()
+    speedometer = Speedometer(state)
+    odometer = Odometer(state)
 
     create_dashboard(root, speedometer)
 
@@ -67,6 +73,7 @@ def main():
 
     def shutdown(signum, frame):
         speedometer.stop()
+        odometer.stop()
         root.destroy()
         exit(0)
 
