@@ -1,2 +1,7 @@
+wheel:
+  diameter: 26
+speedo:
+  interval: 0.1
 odo:
-  mi: 69.02578327304093
+  mi: 69
+  interval: 10
