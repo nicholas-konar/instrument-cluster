@@ -5,7 +5,6 @@ import random
 from tkinter import ttk
 
 
-
 def create_mock_gps():
     state = {"latitude": 40.7128, "longitude": -74.0060}
 
@@ -16,7 +15,7 @@ def create_mock_gps():
     return get_location
 
 
-def create_dashboard(master, speedometer):
+def create_dashboard(master, speedometer, odometer):
     get_location = create_mock_gps()
 
     master.geometry("400x800")
@@ -33,7 +32,7 @@ def create_dashboard(master, speedometer):
     speed_label.pack(pady=20)
 
     odometer_label = ttk.Label(
-        master, text=f"Odometer: {speedometer.odo()} miles", font=("Arial", 24))
+        master, text=f"Odometer: {odometer.miles()} miles", font=("Arial", 24))
     odometer_label.pack(pady=10)
 
     def update_map():
@@ -44,7 +43,7 @@ def create_dashboard(master, speedometer):
 
     def update_labels():
         speed_label.config(text=f"{speedometer.speed()} mph")
-        odometer_label.config(text=f"Odometer: {speedometer.odo()} miles")
+        odometer_label.config(text=f"Odometer: {odometer.miles()} miles")
         master.after(100, update_labels)
 
     update_map()
@@ -55,4 +54,3 @@ def control_panel(master, speedometer):
     master.title("Sensor Test Interface")
     ttk.Button(master, text="Trigger Sensor",
                command=speedometer.trigger_sensor).pack(pady=20)
-

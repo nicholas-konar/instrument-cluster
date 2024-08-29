@@ -7,7 +7,7 @@ from speedometer import Speedometer
 from user_interface import create_dashboard, control_panel
 
 def main():
-    def shutdown(signum, frame):
+    def shutdown():
         speedometer.stop()
         odometer.stop()
         root.destroy()
@@ -20,7 +20,7 @@ def main():
     speedometer = Speedometer(state)
     odometer = Odometer(state)
 
-    create_dashboard(root, speedometer)
+    create_dashboard(root, speedometer, odometer)
 
     ctrl_panel_root = tk.Toplevel(root)
     control_panel(ctrl_panel_root, speedometer)
