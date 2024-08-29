@@ -17,18 +17,19 @@ def mph(r, t): return miles(r) / hour(t)
 def smooth(n, s): return n * .5 + s * .5
 
 
-def speed(r, t, d, s):
-    real = mph(r, d) if r > 0 else s
+def calculate(r, d, s, t):
+    measured = mph(r, d) if r > 0 else s
     potential = mph(1, time.time() - t)
-    display = min(real, potential)
+    speed = min(measured, potential)
+    display = smooth(speed, s)
     return math.floor(display) if potential > 1.5 else 0
 
 
 def update_state(state: State):
-    revs, dwell, speed, time, _ = state
+    r, d, s, t, _ = state
     state.revs = 0
-    state.speed = speed(revs, time, dwell, speed)
-    state.odo += miles(revs)
+    state.speed = calculate(r, d, s, t)
+    state.odo += miles(r)
     return state
 
 
