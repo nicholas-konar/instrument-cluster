@@ -6,8 +6,9 @@ from state import State
 from config import read_config
 
 config = read_config()
-diameter = config['wheel']['diameter']
+diameter = config['wheel_diameter']
 circumference = diameter * math.pi
+
 
 def distance(r): return r * circumference
 def miles(r): return distance(r) / 12 / 5280  # inches -> miles
@@ -34,7 +35,7 @@ def update_state(state: State):
 class Speedometer:
     def __init__(self, state: State):
         self.state = state
-        self.interval = config['speedo']['interval']
+        self.interval = config['speedo_interval']
         self.thread = threading.Thread(target=self.start, daemon=True)
         self.stop_event = threading.Event()
         self.lock = threading.Lock()
@@ -51,9 +52,6 @@ class Speedometer:
 
     def speed(self):
         return self.state.speed
-
-    def odo(self):
-        return self.state.odo
 
     def trigger_sensor(self):
         now = time.time()

@@ -10,7 +10,7 @@ class State:
         self.dwell = 0
         self.speed = 0
         self.last = time.time()
-        self.odo = config['odo']['mi']
+        self.odo = config['odo_miles']
 
     def __iter__(self):
         return iter(vars(self).values())

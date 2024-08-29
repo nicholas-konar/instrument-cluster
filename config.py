@@ -15,4 +15,4 @@ def read_config():
 
 def write_config(config):
     with open('config.yaml', 'w') as f:
-        yaml.dump(config, f)
+        yaml.safe_dump({**read_config(), **config}, f)

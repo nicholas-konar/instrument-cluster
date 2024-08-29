@@ -10,16 +10,19 @@ config = read_config()
 class Odometer:
     def __init__(self, state: State):
         self.state = state
-        self.interval = config['odo']['interval']
-        self.thread = threading.Thread(target=self.auto_save, daemon=True)
+        self.interval = config['odo_interval']
+        self.thread = threading.Thread(target=self.start, daemon=True)
         self.stop_event = threading.Event()
         self.thread.start()
 
-    def auto_save(self):
+    def start(self):
         while not self.stop_event.is_set():
-            write_config({'odo': {'mi': self.state.odo}})
+            write_config({'odo_miles': self.state.odo})
             time.sleep(self.interval)
 
     def stop(self):
         # daemon threads will self terminate
         self.stop_event.set()
+
+    def miles(self):
+        return self.state.odo
