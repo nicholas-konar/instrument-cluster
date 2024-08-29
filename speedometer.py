@@ -6,32 +6,48 @@ wheel_size = 26  # move to config file
 odometer = 69
 
 
+class State:
+    def __init__(self):
+        self.revs = 0
+        self.dwell = 0
+        self.speed = 0
+        self.time = time.time()
+        self.odo = odometer
+
+    def __iter__(self):
+        return iter(vars(self).values())
+
+    def __repr__(self):
+        return f"[{', '.join(f'{k}:{v}' for k, v in vars(self).items())}]"
+
+
 def distance(r): return (wheel_size * math.pi) * r
 def miles(inch): return distance(inch) / 12 / 5280  # miles
 def hour(t): return t / 60 / 60  # hours
 def mph(r, t): return miles(r) / hour(t)
+def smooth(n, s): return n * .5 + s * .5
 
 
-def current_speed(revs, last, dwell, speed):
-    real = mph(revs, dwell) if revs > 0 else speed
-    potential = mph(1, time.time() - last)
-    n = min(real, potential)
-    # jump to 0 early for aesthetics
-    return math.floor(n) if potential > 1.5 else 0
+def current_speed(r, t, d, s):
+    real = mph(r, d) if r > 0 else s
+    potential = mph(1, time.time() - t)
+    display = min(real, potential)
+    return math.floor(display) if potential > 1.5 else 0
 
 
-def update_state(state):
-    revs, time, speed, odo, dwell = state
-    state[0] = 0
-    state[2] = current_speed(revs, time, dwell, speed)
-    state[3] += miles(revs)
+def update_state(state: State):
+    # todo: account for multiple revolutions
+    revs, dwell, speed, time, _ = state
+    state.revs = 0
+    state.speed = current_speed(revs, time, dwell, speed)
+    state.odo += miles(revs)
     return state
 
 
 class Speedometer:
     def __init__(self):
         # todo: get wheel size & odo
-        self.state = [0, time.time(), 0, odometer, 0]
+        self.state = State()
         self.thread = threading.Thread(target=self.run, daemon=True)
         self.stop_event = threading.Event()
         self.lock = threading.Lock()
@@ -43,20 +59,18 @@ class Speedometer:
 
     def run(self):
         while not self.stop_event.is_set():
-            print(self.state)
             self.state = update_state(self.state)
-            time.sleep(0.1)
+            time.sleep(0.5)
 
     def speed(self):
-        return self.state[2]
+        return self.state.speed
 
     def odo(self):
-        return self.state[3]
+        return self.state.odo
 
     def trigger_sensor(self):
         now = time.time()
-        duration = now - self.state[1]
-        print('dwell time', duration)
-        self.state[0] += 1
-        self.state[1] = now
-        self.state[4] = duration
+        dwell = now - self.state.time
+        self.state.revs += 1
+        self.state.time = now
+        self.state.dwell = dwell
