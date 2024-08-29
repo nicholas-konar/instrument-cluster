@@ -4,6 +4,7 @@ import threading
 
 wheel_size = 26  # move to config file
 odometer = 69
+refresh_rate = 0.1
 
 
 class State:
@@ -11,7 +12,7 @@ class State:
         self.revs = 0
         self.dwell = 0
         self.speed = 0
-        self.time = time.time()
+        self.last = time.time()
         self.odo = odometer
 
     def __iter__(self):
@@ -48,19 +49,19 @@ class Speedometer:
     def __init__(self):
         # todo: get wheel size & odo
         self.state = State()
-        self.thread = threading.Thread(target=self.run, daemon=True)
+        self.thread = threading.Thread(target=self.start, daemon=True)
         self.stop_event = threading.Event()
         self.lock = threading.Lock()
         self.thread.start()
 
+    def start(self):
+        while not self.stop_event.is_set():
+            self.state = update_state(self.state)
+            time.sleep(refresh_rate)
+
     def stop(self):
         # daemon threads will self terminate
         self.stop_event.set()
-
-    def run(self):
-        while not self.stop_event.is_set():
-            self.state = update_state(self.state)
-            time.sleep(0.5)
 
     def speed(self):
         return self.state.speed
@@ -70,7 +71,7 @@ class Speedometer:
 
     def trigger_sensor(self):
         now = time.time()
-        dwell = now - self.state.time
+        if not self.state.revs:
+            self.state.dwell = now - self.state.last
+        self.state.last = now
         self.state.revs += 1
-        self.state.time = now
-        self.state.dwell = dwell
