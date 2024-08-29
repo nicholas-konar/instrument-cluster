@@ -17,7 +17,7 @@ def mph(r, t): return miles(r) / hour(t)
 def smooth(n, s): return n * .5 + s * .5
 
 
-def current_speed(r, t, d, s):
+def speed(r, t, d, s):
     real = mph(r, d) if r > 0 else s
     potential = mph(1, time.time() - t)
     display = min(real, potential)
@@ -27,7 +27,7 @@ def current_speed(r, t, d, s):
 def update_state(state: State):
     revs, dwell, speed, time, _ = state
     state.revs = 0
-    state.speed = current_speed(revs, time, dwell, speed)
+    state.speed = speed(revs, time, dwell, speed)
     state.odo += miles(revs)
     return state
 
