@@ -25,4 +25,4 @@ class Odometer:
         self.stop_event.set()
 
     def miles(self):
-        return self.state.odo
+        return f"{self.state.odo:.2f}"
