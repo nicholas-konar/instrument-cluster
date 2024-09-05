@@ -26,7 +26,7 @@ def calculate(r, d, s, t):
 
 
 def update_state(state: State):
-    r, d, s, t, _ = state
+    r, d, s, t, _, _ = state
     state.revs = 0
     state.speed = calculate(r, d, s, t)
     state.odo += miles(r)

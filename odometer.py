@@ -16,8 +16,11 @@ class Odometer:
         self.thread.start()
 
     def start(self):
+        last = self.state.odo
         while not self.stop_event.is_set():
-            write_config({'odo_miles': self.state.odo})
+            if (self.state.odo > last):
+                write_config({'odo_miles': self.state.odo})
+                last = self.state.odo
             time.sleep(self.interval)
 
     def stop(self):

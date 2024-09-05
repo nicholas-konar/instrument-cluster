@@ -1,4 +1,5 @@
+gps_interval: 5
 odo_interval: 10
-odo_miles: 0.3583874952674739
+odo_miles: 0.5362920792491706
 speedo_interval: 0.1
 wheel_diameter: 26
